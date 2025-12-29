@@ -1,21 +1,28 @@
 ## PSsvctask
-## 1.251119
+# 1.251228
 
 [CmdletBinding(DefaultParameterSetName = 'Task')]
 param (
-    [Parameter(Position = 0, ValueFromPipeline=$true, Mandatory = $true, ParameterSetName = 'Task')]
+	[Parameter(Position = 0, ValueFromPipeline=$true, Mandatory = $true, ParameterSetName = 'Task')]
 	[ValidateNotNullOrEmpty()]
-    [string]$Task,
+	[string]$Task,
 
-    [Parameter(Mandatory = $true, ParameterSetName = 'Module')]
+	[Parameter(Mandatory = $true, ParameterSetName = 'Module')]
 	[ValidateNotNullOrEmpty()]
-    [string]$Module
+	[string]$Module
 )
 
 # Import global service settings
-if ($global:ServiceSettings -eq $null) {
+if ($null -eq $global:ServiceSettings) {
 	try { $global:ServiceSettings = Import-PowerShellDataFile -Path (Join-Path $PSScriptRoot "ServiceSettings.psd1") }
 	catch { throw "Unable to import service settings: $_" }
+}
+
+# Validate required settings exist
+@('ServiceAccount', 'ServiceHost', 'ModulesPath', 'TasksPath') | ForEach-Object {
+	if (-not $global:ServiceSettings.ContainsKey($_)) {
+		throw "ServiceSettings.psd1 is missing required key: $_"
+	}
 }
 
 # Check if set folders exist
@@ -36,7 +43,10 @@ function Import-PSsvctaskModule {
 	)
 	$ModulePath = (Join-Path $global:ServiceSettings.ModulesPath "$ServiceModule\$ServiceModule.psm1")
 	if (Test-Path $ModulePath) { 
-		try { Import-Module $ModulePath -Scope Global -Force -ErrorAction Stop }
+		try { 
+			Import-Module $ModulePath -Scope Global -Force -ErrorAction Stop
+			Write-ServiceLog "Imported service module $ServiceModule." -Status $true
+		}
 		catch {
 			if (-not $Module) {
 				Write-ServiceLog "Unable to import $ServiceModule - $_" -Status $false
@@ -56,12 +66,12 @@ if ($Module) { Import-PSsvctaskModule $Module }
 elseif ($Task) {
 	# Check task exists
 	$TaskScript = (Join-Path $global:ServiceSettings.TasksPath "$Task.ps1")
-	$TaskSettings = (Join-Path $global:ServiceSettings.TasksPath "$Task.psd1")
+	$TaskSettingsPath = (Join-Path $global:ServiceSettings.TasksPath "$Task.psd1")
 	if (-not (Test-Path $TaskScript)) { throw "Unable to find $Task.ps1." }
-	if (-not (Test-Path $TaskSettings)) { throw "Unable to find $Task.psd1." }
+	if (-not (Test-Path $TaskSettingsPath)) { throw "Unable to find $Task.psd1." }
 	
 	# Import task settings
-	try { $TaskSettings = Import-PowerShellDataFile $TaskSettings }
+	try { $TaskSettings = Import-PowerShellDataFile $TaskSettingsPath }
 	catch { throw "Unable to import task settings: $_" }
 	
 	# Create log file
@@ -74,7 +84,7 @@ elseif ($Task) {
 	# Check if required parameters exist
 	if ($TaskSettings.ContainsKey('ServiceModules') -and $TaskSettings.ContainsKey('PowerShellModules')) {
 		# Import service modules needed for this service
-		# Always ensure ServiceLog is loaded
+		# ServiceLog is always loaded, so exclude it here
 		$TaskSettings.ServiceModules = $TaskSettings.ServiceModules -ne 'ServiceLog'
 		$TaskSettings.ServiceModules | ForEach-Object { Import-PSsvctaskModule $_ }
 		
@@ -93,7 +103,8 @@ elseif ($Task) {
 		# Enable test mode if service account or host is not being used
 		$global:ServiceTestMode = (($env:USERNAME -ne $global:ServiceSettings.ServiceAccount) -or ($env:COMPUTERNAME -ne $global:ServiceSettings.ServiceHost))
 		if ($global:ServiceTestMode) { Write-ServiceLog ("Service test mode active, running under " + $env:USERNAME + " on " + $env:COMPUTERNAME) }
-		
+		if ([Environment]::UserInteractive) { Write-ServiceLog "Running in interactive mode." }
+	
 		if (-not $TaskError) {
 			# Start task
 			try { . $TaskScript; Write-ServiceLog "Task $Task exited with no terminating error." -Status $true }
@@ -102,6 +113,11 @@ elseif ($Task) {
 	} else { Write-ServiceLog "$Task.psd1 file is damaged or invalid." -Status $false }
 	
 	# Task ended
+	if ($global:ServiceTestMode) {
+		if ([Environment]::UserInteractive) {
+			Write-ServiceLog "Pausing in console due to test mode."
+			pause
+		}
+	}
 	Write-ServiceLog -Line
-	if ($global:ServiceTestMode) { pause }
 }

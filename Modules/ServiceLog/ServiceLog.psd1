@@ -1,10 +1,10 @@
 @{
-    RootModule = "ServiceLog.psm1"
+	RootModule = "ServiceLog.psm1"
 	ModuleVersion = "0.0.0.0"
 	
 	PrivateData = @{
-        LocalLogPath  = "C:\PSsvctask\Logs"
-        RemoteLogPath = "C:\PSsvctask\Logs"
-        LogRetentionDays = 10
-    }
+		LocalLogPath  = "C:\PSsvctask\Logs"
+		RemoteLogPath = "C:\PSsvctask\Logs"
+		LogRetentionDays = 10
+	}
 }

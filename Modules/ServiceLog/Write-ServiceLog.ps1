@@ -1,19 +1,19 @@
 function Write-ServiceLog {
-    param (
-        [Parameter(Position=0)]
-        [string]$Message,
+	param (
+		[Parameter(Position=0)]
+		[string]$Message,
 		
 		[Parameter()]
-        [bool]$Status,  # Optional Boolean for PASS/FAIL
+		[bool]$Status,  # Optional Boolean for PASS/FAIL
 		
 		[Parameter()]
-        [switch]$Line  # Add line break
-    )
+		[switch]$Line  # Add line break
+	)
 	
 	if ([string]::IsNullOrWhitespace($Message) -And (-Not $Line)) { return }
 	
 	# Ensure the log file path is available
-    if (-not $script:LogFile) { throw "Log file is not specified." }
+	if (-not $script:LogFile) { throw "Log file is not specified." }
 	
 	# If -Line specified, ignore anything else
 	if ($Line) { $LogEntry = "==============================================================================" }
@@ -34,6 +34,6 @@ function Write-ServiceLog {
 		$LogEntry = " $Timestamp [$StatusText] $Message"
 	}
 	
-    Add-Content -Path $script:LogFile -Value $LogEntry
+	Add-Content -Path $script:LogFile -Value $LogEntry
 	Write-Output $LogEntry
 }
