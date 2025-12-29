@@ -103,9 +103,12 @@ Create modules when you have code used by multiple tasks. Example: An email noti
 
 2. Create `EmailNotify.psm1`:
 ```powershell
-if (-not $script:Settings) { 
-    $script:Settings = (Test-ModuleManifest -Path (Join-Path $PSScriptRoot 'EmailNotify.psd1')).PrivateData 
-}
+## EXAMPLE MODULE
+
+# Initialize module settings
+if (-not $script:Settings) { $script:Settings = (Import-PowerShellDataFile -Path (Join-Path $PSScriptRoot ((Split-Path $PSScriptRoot -Leaf) + '.psd1'))).PrivateData }
+
+# Import modules
 Get-ChildItem -Path $PSScriptRoot -Filter '*.ps1' -File | ForEach-Object { . $_.FullName }
 ```
 
