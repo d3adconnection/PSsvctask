@@ -103,7 +103,6 @@ Create modules when you have code used by multiple tasks. Example: An email noti
 
 2. Create `EmailNotify.psm1`:
 ```powershell
-if (-not $global:ServiceSettings) { throw "Service settings not initialized" }
 if (-not $script:Settings) { 
     $script:Settings = (Test-ModuleManifest -Path (Join-Path $PSScriptRoot 'EmailNotify.psd1')).PrivateData 
 }
