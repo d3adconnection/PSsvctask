@@ -80,10 +80,10 @@ foreach ($File in $OldFiles) {
 }
 ```
 
-Framework settings:
+Required Task settings:
 - `ServiceModules` - Array of custom modules from your Modules folder to load
 - `PowerShellModules` - Array of standard PowerShell modules to import
-- `LogFileNameTime` - When `$true`, appends timestamp to log filename (e.g., TaskName_HHMMSS.log). When `$false` (default), uses just TaskName.log
+- `LogFileNameTime` - When `$true`, creates a task-specific subfolder and includes time in the log filename (e.g., `Logs\YYYY-MM-DD\TaskName\TaskName - HH MM TT.log`). When `$false` (default), logs go directly in the date folder (e.g., `Logs\YYYY-MM-DD\TaskName.log`). Use `$true` for tasks that run multiple times per day
 
 3. Run it: `.\PSsvctask.ps1 CleanTempFiles`
 
