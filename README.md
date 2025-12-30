@@ -7,8 +7,8 @@ Lightweight PowerShell framework providing logging and configuration for automat
 1. Clone or copy this folder anywhere on your server or network share (e.g., C:\PSsvctask, D:\Scripts\PSsvctask, \\server\share\PSsvctask)
 2. Edit `ServiceSettings.psd1` (must be in same folder as PSsvctask.ps1) and set your paths, hostname, and service account
 3. Edit `ServiceLog.psd1` (see Basic Configuration) and set your paths for logging
-3. Run a task: `.\PSsvctask.ps1 ExampleTask`
-4. Check logs in the `Logs\` folder
+4. Run a task: `.\PSsvctask.ps1 ExampleTask`
+5. Check logs in the `Logs\` folder
 
 ## Basic Configuration
 
