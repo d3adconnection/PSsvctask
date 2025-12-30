@@ -80,6 +80,11 @@ foreach ($File in $OldFiles) {
 }
 ```
 
+Framework settings:
+- `ServiceModules` - Array of custom modules from your Modules folder to load
+- `PowerShellModules` - Array of standard PowerShell modules to import
+- `LogFileNameTime` - When `$true`, appends timestamp to log filename (e.g., TaskName_HHMMSS.log). When `$false` (default), uses just TaskName.log
+
 3. Run it: `.\PSsvctask.ps1 CleanTempFiles`
 
 Note: Any key you add to the task's .psd1 file is accessible via `$TaskSettings.YourKey` in your script.
