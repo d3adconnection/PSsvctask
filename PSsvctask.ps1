@@ -66,6 +66,9 @@ elseif ($Task) {
 	if (-not (Test-Path $TaskScript)) { throw "Unable to find $Task.ps1." }
 	if (-not (Test-Path $TaskSettingsPath)) { throw "Unable to find $Task.psd1." }
 	
+	# Fix letter case
+	$Task = (Get-Item $TaskScript).BaseName
+	
 	# Import task settings
 	try { $TaskSettings = Import-PowerShellDataFile $TaskSettingsPath }
 	catch { throw "Unable to import task settings: $_" }
