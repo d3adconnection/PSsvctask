@@ -103,8 +103,8 @@ elseif ($Task) {
 	
 		if (-not $TaskError) {
 			# Start task
-			try { . $TaskScript; Write-ServiceLog "Task $Task exited with no terminating error." -Status $true }
-			catch { Write-ServiceLog $_ -Status $false }
+			try { . $TaskScript; Write-ServiceLog -Line; Write-ServiceLog "Task $Task exited with no terminating error." -Status $true }
+			catch { Write-ServiceLog $_ -Status $false; Write-ServiceLog -Line; Write-ServiceLog "Task $Task exited with terminating error." -Status $false }
 		}
 	} else { Write-ServiceLog "$Task.psd1 file is damaged or invalid." -Status $false }
 	
