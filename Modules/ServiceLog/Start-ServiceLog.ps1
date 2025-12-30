@@ -27,7 +27,7 @@ function Start-ServiceLog {
 	}
 
 	# Generate log file name
-	$TimeSuffix = if ($IncludeTime) { (" - " + (Get-Date -Format "HH-mm-ss")) } else { "" }
+	$TimeSuffix = if ($IncludeTime) { (" - " + (Get-Date -Format "hh mm tt")) } else { "" }
 	$script:LogFile = (Join-Path $script:LogPath "$TaskName$TimeSuffix.log")
 	
 	# Purge any preexisting log file in the same location if it exists

@@ -50,4 +50,3 @@ ExampleFunction "1stParameterExample" "2ndParameterExample"
 Write-ServiceLog -Line
 Write-ServiceLog ("Getting text from ExampleModule: " + (Write-ExampleText))
 Write-ServiceLog ("Getting text from ExampleModule with parameter: " + (Write-ExampleText -IncludeVersion $true))
-Write-ServiceLog -Line

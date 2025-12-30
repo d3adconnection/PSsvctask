@@ -1,5 +1,5 @@
 ## PSsvctask
-# 1.251228
+# 1.251229
 
 [CmdletBinding(DefaultParameterSetName = 'Task')]
 param (
@@ -13,16 +13,12 @@ param (
 )
 
 # Import global service settings
-if ($null -eq $global:ServiceSettings) {
-	try { $global:ServiceSettings = Import-PowerShellDataFile -Path (Join-Path $PSScriptRoot "ServiceSettings.psd1") }
-	catch { throw "Unable to import service settings: $_" }
-}
+try { $global:ServiceSettings = Import-PowerShellDataFile -Path (Join-Path $PSScriptRoot "ServiceSettings.psd1") }
+catch { throw "Unable to import service settings: $_" }
 
 # Validate required settings exist
 @('ServiceAccount', 'ServiceHost', 'ModulesPath', 'TasksPath') | ForEach-Object {
-	if (-not $global:ServiceSettings.ContainsKey($_)) {
-		throw "ServiceSettings.psd1 is missing required key: $_"
-	}
+	if (-not $global:ServiceSettings.ContainsKey($_)) {	throw "ServiceSettings.psd1 is missing required key: $_" }
 }
 
 # Check if set folders exist
@@ -86,7 +82,7 @@ elseif ($Task) {
 		# Import service modules needed for this service
 		# ServiceLog is always loaded, so exclude it here
 		$TaskSettings.ServiceModules = $TaskSettings.ServiceModules -ne 'ServiceLog'
-		$TaskSettings.ServiceModules | ForEach-Object { Import-PSsvctaskModule $_ }
+		if ($TaskSettings.ServiceModules) {	$TaskSettings.ServiceModules | ForEach-Object { Import-PSsvctaskModule $_ } }
 		
 		# Import PowerShell modules needed for this service
 		$TaskSettings.PowerShellModules | ForEach-Object {
@@ -113,11 +109,9 @@ elseif ($Task) {
 	} else { Write-ServiceLog "$Task.psd1 file is damaged or invalid." -Status $false }
 	
 	# Task ended
-	if ($global:ServiceTestMode) {
-		if ([Environment]::UserInteractive) {
-			Write-ServiceLog "Pausing in console due to test mode."
-			pause
-		}
+	if ([Environment]::UserInteractive) {
+		Write-ServiceLog "Pausing console in interactive mode."
+		pause
 	}
 	Write-ServiceLog -Line
 }
