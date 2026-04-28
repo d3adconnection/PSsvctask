@@ -1,5 +1,5 @@
 ## PSsvctask
-# 1.251229
+# 1.260217
 
 [CmdletBinding(DefaultParameterSetName = 'Task')]
 param (
@@ -41,7 +41,11 @@ function Import-PSsvctaskModule {
 	if (Test-Path $ModulePath) { 
 		try { 
 			Import-Module $ModulePath -Scope Global -Force -ErrorAction Stop
-			Write-ServiceLog "Imported service module $ServiceModule." -Status $true
+			if ($Module) {
+				Write-Host "Imported service module $ServiceModule." -ForegroundColor Green
+			} else {
+				Write-ServiceLog "Imported service module $ServiceModule." -Status $true
+			}
 		}
 		catch {
 			if (-not $Module) {
@@ -58,7 +62,9 @@ function Import-PSsvctaskModule {
 }
 
 # If Module specified, just import module
-if ($Module) { Import-PSsvctaskModule $Module }
+if ($Module) { 
+	Import-PSsvctaskModule $Module 
+}
 elseif ($Task) {
 	# Check task exists
 	$TaskScript = (Join-Path $global:ServiceSettings.TasksPath "$Task.ps1")
