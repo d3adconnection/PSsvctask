@@ -13,7 +13,7 @@ function Write-ServiceLog {
 	if ([string]::IsNullOrWhitespace($Message) -And (-Not $Line)) { return }
 	
 	# Ensure the log file path is available
-	if (-not $script:LogFile) { throw "Log file is not specified." }
+	if (-not $global:LogFile) { throw "Log file is not specified." }
 	
 	# If -Line specified, ignore anything else
 	if ($Line) { $LogEntry = "==============================================================================" }
@@ -34,6 +34,6 @@ function Write-ServiceLog {
 		$LogEntry = " $Timestamp [$StatusText] $Message"
 	}
 	
-	Add-Content -Path $script:LogFile -Value $LogEntry
-	Write-Output $LogEntry
+	Add-Content -Path $global:LogFile -Value $LogEntry
+	Write-Host $LogEntry
 }
